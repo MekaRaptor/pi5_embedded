@@ -15,7 +15,15 @@ test: test_alarm
 analiz:
 	cppcheck --enable=all --suppress=missingIncludeSystem *.c
 
-clean:
-	rm -f sicaklik test_alarm
+kapsam:
+	rm -f *.o *.gcda *.gcno *.gcov
+	$(CC) $(CFLAGS) -O0 --coverage -fcondition-coverage -c alarm.c
+	$(CC) $(CFLAGS) -O0 -c test_alarm.c
+	$(CC) --coverage -o test_kapsam test_alarm.o alarm.o
+	./test_kapsam
+	gcov -b --conditions alarm.c
 
-.PHONY: all test analiz clean
+clean:
+	rm -f sicaklik test_alarm test_kapsam *.o *.gcda *.gcno *.gcov
+
+.PHONY: all test analiz kapsam clean

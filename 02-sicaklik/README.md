@@ -43,6 +43,18 @@ Durum geçiş mantığı (`durum_guncelle`) donanımdan bağımsızdır ve birim
 
 Testlerin hata yakalama yeteneği mutasyon testi ile doğrulandı
 
+## Kod kapsamı (alarm.c)
+GCC 14 gcov ile ölçülmüştür (`make kapsam`).
+
+| Ölçüt | Sonuç |
+|---|---|
+| Satır (statement) | %100 |
+| Dal (decision) | %100 |
+| Koşul (masking MC/DC, `-fcondition-coverage`) | %100 |
+
+Not: GCC, masking MC/DC ölçer. Kısa devre (`&&`) nedeniyle
+değerlendirilmeyen koşullar maskelenmiş sayılır.
+
 ## Statik analiz sapmaları
 | Uyarı | Yer | Gerekçe |
 |---|---|---|

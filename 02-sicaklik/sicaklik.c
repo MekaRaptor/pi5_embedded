@@ -29,11 +29,11 @@ static int write_file(const char *path, const char *value)
 
 /* Sıcaklığı milidereceler cinsinden okur.
    Başarılıysa 0 döner ve değeri *sicaklik_mC'ye yazar, hata olursa -1 döner. */
-static int sicaklik_oku(int *sicaklik_mC)
+static int sicaklik_oku(const char *yol, int *sicaklik_mC)
 {
-    FILE *f = fopen(TEMP_PATH, "r");
+    FILE *f = fopen(yol, "r");
     if (f == NULL) {
-        perror(TEMP_PATH);
+        perror(yol);
         return -1;
     }
     /* fscanf ile dosyadan bir tam sayı oku. fscanf okuduğu değer sayısını döner; 1 değilse hata say. */
@@ -59,9 +59,15 @@ static int sicaklik_oku(int *sicaklik_mC)
 //     return onceki_durum;
 // }
 
-int main(void)
+int main(int argc, char *argv[])
 {
     int alarm = 0;
+    const char *sicaklik_yolu = TEMP_PATH;   /* varsayılan: gerçek sensör */
+
+    if (argc > 1) {
+        sicaklik_yolu = argv[1];             /* verilirse: sahte sensör */
+    }
+    printf("Okunan dosya: %s\n", sicaklik_yolu);
 
     if (write_file(LED_PATH "trigger", "none") != 0) {
         return 1;
@@ -69,8 +75,8 @@ int main(void)
 
     while (1) {
         int t;
-        if (sicaklik_oku(&t) != 0) {
-            /* TODO: REQ-4, LED'i hızlı yakıp söndür */
+        if (sicaklik_oku(sicaklik_yolu, &t) != 0) {
+            /* REQ-4: hata durumu, LED hızlı yanıp söner */
             write_file(LED_PATH "brightness", "1");
             usleep(100000);   /* 100 ms */
             write_file(LED_PATH "brightness", "0");
@@ -82,7 +88,7 @@ int main(void)
         printf("Sicaklik: %d.%02d C  Alarm: %s\n",
                t / 1000, (t % 1000) / 10, alarm ? "ACIK" : "kapali");
 
-        /*alarm değerine göre LED'e "1" veya "0" yaz */
+        /* alarm değerine göre LED'i yak veya söndür */
         write_file(LED_PATH "brightness", alarm ? "1" : "0");
 
         usleep(500000);

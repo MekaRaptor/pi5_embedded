@@ -6,3 +6,5 @@
 *.gcno
 *.gcov
 02-sicaklik/test_kapsam
+03-arinc429/test_arinc
+03-arinc429/test_kapsam

@@ -20,6 +20,16 @@ static unsigned int bir_say(uint32_t x)
     }
     return n;
 }
+/* 8 bitlik değerin bit sırasını ters çevirir (A429-REQ-6) */
+static uint8_t bit_ters(uint8_t x)
+{
+    uint8_t r = 0;
+    for (unsigned int i = 0; i < 8u; i++) {
+        r = (uint8_t)((r << 1) | (x & 1u));
+        x >>= 1;
+    }
+    return r;
+}
 
 int a429_kodla(const a429_alanlar_t *a, uint32_t *kelime)
 {
@@ -31,10 +41,11 @@ int a429_kodla(const a429_alanlar_t *a, uint32_t *kelime)
     }
 
     /* A429-REQ-1: alanları yerleştir */
-    k |= (uint32_t)a->label;
+    k |= (uint32_t)bit_ters(a->label);
     k |= (uint32_t)a->sdi << SDI_KAYMA;
     k |= a->data << DATA_KAYMA;
     k |= (uint32_t)a->ssm << SSM_KAYMA;
+    
 
     /* A429-REQ-2: tek parity. 1 sayısı çiftse parity bitini yak */
     if (bir_say(k) % 2u == 0u) {
@@ -53,10 +64,11 @@ int a429_coz(uint32_t kelime, a429_alanlar_t *a)
     }
 
     /* A429-REQ-4: alanları ayır */
-    a->label = (uint8_t)(kelime & LABEL_MASKE);
+    a->label = bit_ters((uint8_t)(kelime & LABEL_MASKE));
     a->sdi   = (uint8_t)((kelime >> SDI_KAYMA) & SDI_MASKE);
     a->data  = (kelime >> DATA_KAYMA) & DATA_MASKE;
     a->ssm   = (uint8_t)((kelime >> SSM_KAYMA) & SSM_MASKE);
+    
 
     return A429_OK;
 }

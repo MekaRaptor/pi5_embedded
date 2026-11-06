@@ -28,11 +28,19 @@ int main(void)
 
     a = (a429_alanlar_t){ 0203, 0, 0, 0 };   /* 0203 octal = 0x83 */
     a429_kodla(&a, &k);
-    kontrol("TC-02 REQ-1 label 203 (octal)", 0x00000083UL, k);
+    kontrol("TC-02 REQ-1 label 203 (octal)", 0x000000C1UL, k);
+    
+    a = (a429_alanlar_t){ 0001, 0, 0, 0 };   /* 0000 0001 -> 1000 0000 */
+    a429_kodla(&a, &k);
+    kontrol("TC-02b REQ-6 label 001 -> 0x80", 0x00000080UL, k);
+
+    a = (a429_alanlar_t){ 0200, 0, 0, 0 };   /* 1000 0000 -> 0000 0001 */
+    a429_kodla(&a, &k);
+    kontrol("TC-02c REQ-6 label 200 -> 0x01", 0x00000001UL, k);
 
     a = (a429_alanlar_t){ 0203, 1, 1, 3 };
     a429_kodla(&a, &k);
-    kontrol("TC-03 REQ-1 label 203, SDI 1, data 1, SSM 3", 0x60000583UL, k);
+    kontrol("TC-03 REQ-1 label 203, SDI 1, data 1, SSM 3", 0x600005C1UL, k);
 
     a = (a429_alanlar_t){ 0, 0, 0x7FFFF, 0 };
     a429_kodla(&a, &k);
@@ -56,7 +64,7 @@ int main(void)
             (unsigned long)A429_ALAN_HATASI, (unsigned long)a429_kodla(&a, &k));
 
     /* ---- Çözme: REQ-4 ---- */
-    r = a429_coz(0x60000583UL, &c);
+    r = a429_coz(0x600005C1UL, &c);
     kontrol("TC-09 REQ-4 coz: sonuc OK", A429_OK, (unsigned long)r);
     kontrol("TC-10 REQ-4 coz: label", 0203, c.label);
     kontrol("TC-11 REQ-4 coz: SDI",   1,    c.sdi);
@@ -64,7 +72,7 @@ int main(void)
     kontrol("TC-13 REQ-4 coz: SSM",   3,    c.ssm);
 
     /* ---- Çözme: REQ-5, tek bit hatası ---- */
-    r = a429_coz(0x60000583UL ^ (1UL << 12), &c);
+    r = a429_coz(0x600005C1UL ^ (1UL << 12), &c);
     kontrol("TC-14 REQ-5 tek bit bozuk -> parity hatasi",
             (unsigned long)A429_PARITY_HATASI, (unsigned long)r);
 
